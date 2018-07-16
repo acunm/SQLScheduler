@@ -39,7 +39,7 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.ServiceName = "SQLSchedulerService";
+            this.serviceInstaller1.ServiceName = "SQLService";
             // 
             // ProjectInstaller
             // 

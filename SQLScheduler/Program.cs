@@ -16,7 +16,7 @@ namespace SQLScheduler
 
             try
             {
-                ServiceBase[] serviceBases = new ServiceBase[] { new SQLSchedulerService() };
+                ServiceBase[] serviceBases = new ServiceBase[] { new SQLService() };
                 ServiceBase.Run(serviceBases);
             }
             catch (ArgumentException e)

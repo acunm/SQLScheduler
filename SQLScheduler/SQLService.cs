@@ -6,28 +6,20 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace SQLScheduler
 {
-    partial class SQLSchedulerService : ServiceBase
+    partial class SQLService : ServiceBase
     {
-        
-        private System.Diagnostics.EventLog eventLog;
         private int eventId = 1;
 
-        public SQLSchedulerService()
+        public SQLService()
         {
 
             InitializeComponent();
-
-            eventLog1 = new EventLog();
-
-            if (!System.Diagnostics.EventLog.SourceExists("SQLScheduler"))
-            {
-                System.Diagnostics.EventLog.CreateEventSource("SQLScheduler", "SQLScheduler");
-            }
-
+            OnStart(new string[] { });
             eventLog1.Source = "SQLScheduler";
             eventLog1.Log = "SQLScheduler";
 
@@ -35,20 +27,8 @@ namespace SQLScheduler
 
         protected override void OnStart(string[] args)
         {
-
-            foreach (string arg in args)
-            {
-                if (arg == "WAITFORDEBUGGER")
-                {
-                    while (!Debugger.IsAttached)
-                    {
-                        System.Threading.Thread.Sleep(1000);
-                    }
-                }
-            }
-
             System.Timers.Timer timer = new System.Timers.Timer();
-            timer.Interval = 60000; // 60 seconds  
+            timer.Interval = 3000; // 60 seconds  
             timer.Elapsed += new System.Timers.ElapsedEventHandler(this.OnTimer);
             timer.Enabled = true;
             timer.Start();

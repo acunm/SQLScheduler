@@ -1,6 +1,6 @@
 ﻿namespace SQLScheduler
 {
-    partial class SQLSchedulerService
+    partial class SQLService
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,13 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.eventLog = new System.Diagnostics.EventLog();
-            ((System.ComponentModel.ISupportInitialize)(this.eventLog)).BeginInit();
+            this.eventLog1 = new System.Diagnostics.EventLog();
+            ((System.ComponentModel.ISupportInitialize)(this.eventLog1)).BeginInit();
             // 
-            // SQLSchedulerService
+            // SQLService
             // 
-            this.ServiceName = "SQLSchedulerService";
-            ((System.ComponentModel.ISupportInitialize)(this.eventLog)).EndInit();
+            this.ServiceName = "SQLService";
+            ((System.ComponentModel.ISupportInitialize)(this.eventLog1)).EndInit();
 
         }
 
