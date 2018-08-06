@@ -20,10 +20,10 @@ namespace SQLScheduler
             form1 = (Form1)form;
         }
 
+        public Connect() { }
+
 
         public Boolean connectDB(string connectionString) {
-
-            Console.WriteLine("alsdalskjdalksjd" + connectionString);
 
             string name = getIpFromString(connectionString);
 

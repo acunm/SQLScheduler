@@ -110,19 +110,27 @@ namespace SQLScheduler
 
         private Boolean saveInfo(Server server)
         {
-            
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            string path = @"C:\";
 
             DirectoryInfo di = Directory.CreateDirectory(path + @"\SQLScheduler");
 
             if (!File.Exists(path + @"\SQLScheduler\databases.json"))
-                    System.IO.File.WriteAllText(path + @"\SQLScheduler\databases.json", JsonConvert.SerializeObject(server, Formatting.Indented));
-            else {
+            {
+
+                List<Server> servers = new List<Server>();
+                servers.Add(server);
+
+                System.IO.File.WriteAllText(path + @"\SQLScheduler\databases.json", JsonConvert.SerializeObject(servers, Formatting.Indented));
+                return true;
+            }
+            else
+            {
 
                 List<Server> serv = JsonConvert.DeserializeObject<List<Server>>(System.IO.File.ReadAllText(path + @"\SQLScheduler\databases.json"));
                 Boolean save = true;
 
-                foreach(Server x in serv)
+                foreach (Server x in serv)
                 {
 
                     if (x.ip.Equals(server.ip) && x.port.Equals(server.port))
@@ -134,7 +142,7 @@ namespace SQLScheduler
                     serv.Add(server);
                     System.IO.File.WriteAllText(path + @"\SQLScheduler\databases.json", JsonConvert.SerializeObject(serv, Formatting.Indented));
                     return true;
-                } 
+                }
             }
             return false;
         }
@@ -142,14 +150,14 @@ namespace SQLScheduler
         private Boolean changeSavedData(string ipAndPort)
         {
 
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string path = @"C:\SQLScheduler\databases.json";
             string ip = ipAndPort.Split(':')[0];
             string port = ipAndPort.Split(':')[1];
 
-            if (File.Exists(path + @"\SQLScheduler\databases.json"))
+            if (File.Exists(path))
             {
 
-                List<Server> servers = JsonConvert.DeserializeObject<List<Server>>(System.IO.File.ReadAllText(path + @"\SQLScheduler\databases.json"));
+                List<Server> servers = JsonConvert.DeserializeObject<List<Server>>(System.IO.File.ReadAllText(path));
                 List<Server> newServers = new List<Server>();
 
                 foreach (Server x in servers)
@@ -165,7 +173,7 @@ namespace SQLScheduler
                         newServers.Add(x);
                     }
 
-                    System.IO.File.WriteAllText(path + @"\SQLScheduler\databases.json", JsonConvert.SerializeObject(newServers, Formatting.Indented));
+                    System.IO.File.WriteAllText(path, JsonConvert.SerializeObject(newServers, Formatting.Indented));
                     this.Dispose();
                     return true;
 

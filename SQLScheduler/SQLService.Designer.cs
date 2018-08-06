@@ -31,9 +31,11 @@
             this.eventLog1 = new System.Diagnostics.EventLog();
             ((System.ComponentModel.ISupportInitialize)(this.eventLog1)).BeginInit();
             // 
-            // SQLService
+            // eventLog1
             // 
-            this.ServiceName = "SQLService";
+            this.eventLog1.EnableRaisingEvents = true;
+            this.eventLog1.Log = "SQLScheduler";
+            this.eventLog1.Source = "SQLScheduler";
             ((System.ComponentModel.ISupportInitialize)(this.eventLog1)).EndInit();
 
         }

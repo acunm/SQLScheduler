@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.generalTab = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -48,6 +49,10 @@
             this.sqlcommand = new System.Windows.Forms.TextBox();
             this.scheduleTab = new System.Windows.Forms.TabPage();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.hourBox = new System.Windows.Forms.ComboBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.endDate = new System.Windows.Forms.DateTimePicker();
+            this.startDate = new System.Windows.Forms.DateTimePicker();
             this.label8 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -58,13 +63,13 @@
             this.onetime = new System.Windows.Forms.RadioButton();
             this.notificationsTab = new System.Windows.Forms.TabPage();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.notifications = new System.Windows.Forms.TableLayoutPanel();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.logsTab = new System.Windows.Forms.TabPage();
+            this.logBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.startDate = new System.Windows.Forms.DateTimePicker();
-            this.endDate = new System.Windows.Forms.DateTimePicker();
-            this.textBox6 = new System.Windows.Forms.TextBox();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.email = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
             this.generalTab.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -77,6 +82,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.timeupanddown)).BeginInit();
             this.notificationsTab.SuspendLayout();
             this.groupBox6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.logsTab.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -268,16 +274,49 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.hourBox);
+            this.groupBox5.Controls.Add(this.label9);
             this.groupBox5.Controls.Add(this.endDate);
             this.groupBox5.Controls.Add(this.startDate);
             this.groupBox5.Controls.Add(this.label8);
             this.groupBox5.Controls.Add(this.label2);
             this.groupBox5.Location = new System.Drawing.Point(3, 112);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(762, 56);
+            this.groupBox5.Size = new System.Drawing.Size(762, 85);
             this.groupBox5.TabIndex = 1;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Duration";
+            // 
+            // hourBox
+            // 
+            this.hourBox.FormattingEnabled = true;
+            this.hourBox.Location = new System.Drawing.Point(335, 58);
+            this.hourBox.Name = "hourBox";
+            this.hourBox.Size = new System.Drawing.Size(63, 21);
+            this.hourBox.TabIndex = 7;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(296, 61);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(33, 13);
+            this.label9.TabIndex = 6;
+            this.label9.Text = "Hour:";
+            // 
+            // endDate
+            // 
+            this.endDate.Location = new System.Drawing.Point(494, 19);
+            this.endDate.Name = "endDate";
+            this.endDate.Size = new System.Drawing.Size(200, 20);
+            this.endDate.TabIndex = 5;
+            // 
+            // startDate
+            // 
+            this.startDate.Location = new System.Drawing.Point(71, 19);
+            this.startDate.Name = "startDate";
+            this.startDate.Size = new System.Drawing.Size(200, 20);
+            this.startDate.TabIndex = 4;
             // 
             // label8
             // 
@@ -315,7 +354,7 @@
             // 
             this.timeBox.Enabled = false;
             this.timeBox.FormattingEnabled = true;
-            this.timeBox.Location = new System.Drawing.Point(197, 65);
+            this.timeBox.Location = new System.Drawing.Point(150, 65);
             this.timeBox.Name = "timeBox";
             this.timeBox.Size = new System.Drawing.Size(121, 21);
             this.timeBox.TabIndex = 4;
@@ -323,16 +362,16 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(53, 68);
+            this.label1.Location = new System.Drawing.Point(113, 69);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(73, 13);
+            this.label1.Size = new System.Drawing.Size(31, 13);
             this.label1.TabIndex = 3;
-            this.label1.Text = "Occurs every:";
+            this.label1.Text = "times";
             // 
             // timeupanddown
             // 
             this.timeupanddown.Enabled = false;
-            this.timeupanddown.Location = new System.Drawing.Point(141, 66);
+            this.timeupanddown.Location = new System.Drawing.Point(71, 66);
             this.timeupanddown.Name = "timeupanddown";
             this.timeupanddown.Size = new System.Drawing.Size(40, 20);
             this.timeupanddown.TabIndex = 2;
@@ -373,7 +412,7 @@
             // 
             // groupBox6
             // 
-            this.groupBox6.Controls.Add(this.notifications);
+            this.groupBox6.Controls.Add(this.dataGridView1);
             this.groupBox6.Location = new System.Drawing.Point(3, 3);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(762, 261);
@@ -381,29 +420,34 @@
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Notifications";
             // 
-            // notifications
+            // dataGridView1
             // 
-            this.notifications.ColumnCount = 3;
-            this.notifications.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.notifications.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.notifications.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 262F));
-            this.notifications.Location = new System.Drawing.Point(6, 19);
-            this.notifications.Name = "notifications";
-            this.notifications.RowCount = 2;
-            this.notifications.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.notifications.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.notifications.Size = new System.Drawing.Size(750, 236);
-            this.notifications.TabIndex = 0;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.email});
+            this.dataGridView1.Location = new System.Drawing.Point(6, 19);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(750, 236);
+            this.dataGridView1.TabIndex = 0;
             // 
             // logsTab
             // 
-            this.logsTab.Controls.Add(this.textBox6);
+            this.logsTab.Controls.Add(this.logBox);
             this.logsTab.Location = new System.Drawing.Point(4, 22);
             this.logsTab.Name = "logsTab";
             this.logsTab.Size = new System.Drawing.Size(768, 267);
             this.logsTab.TabIndex = 4;
             this.logsTab.Text = "Logs";
             this.logsTab.UseVisualStyleBackColor = true;
+            // 
+            // logBox
+            // 
+            this.logBox.Location = new System.Drawing.Point(3, 3);
+            this.logBox.Multiline = true;
+            this.logBox.Name = "logBox";
+            this.logBox.ReadOnly = true;
+            this.logBox.Size = new System.Drawing.Size(762, 261);
+            this.logBox.TabIndex = 0;
             // 
             // button1
             // 
@@ -425,28 +469,15 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // startDate
+            // contextMenuStrip1
             // 
-            this.startDate.Location = new System.Drawing.Point(71, 14);
-            this.startDate.Name = "startDate";
-            this.startDate.Size = new System.Drawing.Size(200, 20);
-            this.startDate.TabIndex = 4;
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
-            // endDate
+            // email
             // 
-            this.endDate.Location = new System.Drawing.Point(494, 14);
-            this.endDate.Name = "endDate";
-            this.endDate.Size = new System.Drawing.Size(200, 20);
-            this.endDate.TabIndex = 5;
-            // 
-            // textBox6
-            // 
-            this.textBox6.Location = new System.Drawing.Point(3, 3);
-            this.textBox6.Multiline = true;
-            this.textBox6.Name = "textBox6";
-            this.textBox6.ReadOnly = true;
-            this.textBox6.Size = new System.Drawing.Size(762, 261);
-            this.textBox6.TabIndex = 0;
+            this.email.HeaderText = "Email";
+            this.email.Name = "email";
             // 
             // Form3
             // 
@@ -476,6 +507,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.timeupanddown)).EndInit();
             this.notificationsTab.ResumeLayout(false);
             this.groupBox6.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.logsTab.ResumeLayout(false);
             this.logsTab.PerformLayout();
             this.ResumeLayout(false);
@@ -517,9 +549,13 @@
         private System.Windows.Forms.RadioButton recurrent;
         private System.Windows.Forms.RadioButton onetime;
         private System.Windows.Forms.GroupBox groupBox6;
-        private System.Windows.Forms.TableLayoutPanel notifications;
         private System.Windows.Forms.DateTimePicker endDate;
         private System.Windows.Forms.DateTimePicker startDate;
-        private System.Windows.Forms.TextBox textBox6;
+        private System.Windows.Forms.TextBox logBox;
+        private System.Windows.Forms.ComboBox hourBox;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn email;
     }
 }

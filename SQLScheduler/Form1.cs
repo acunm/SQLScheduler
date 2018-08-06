@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
-using System.Data.Sql;
 using System.IO;
 using Newtonsoft.Json;
 using System.Threading;
-using System.ServiceProcess;
 
 namespace SQLScheduler
 {
@@ -25,6 +18,9 @@ namespace SQLScheduler
         private List<Server> serverList = new List<Server>();
         private SqlConnection sqlConnection;
         private FileSystemWatcher fileSystemWatcher;
+        private string jobsName;
+        private TreeNode item;
+        private ListViewItem selectedItem;
 
         public Form1()
         {
@@ -38,9 +34,12 @@ namespace SQLScheduler
         {
             try
             {
+
+                Console.WriteLine("setupWatcher");
+
                 fileSystemWatcher = new FileSystemWatcher();
 
-                fileSystemWatcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\SQLScheduler\";
+                fileSystemWatcher.Path = @"C:\SQLScheduler\";
                 fileSystemWatcher.Filter = "*-jobs.json";
                 fileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite;
                 fileSystemWatcher.Changed += new FileSystemEventHandler((o, e) => { FillJobs(e.Name); });
@@ -54,8 +53,9 @@ namespace SQLScheduler
 
         private void listDatabase_LeftClick(object sender, TreeViewEventArgs e)
         {
-            var item = (TreeNode)((TreeView)sender).SelectedNode;
+            item = (TreeNode)((TreeView)sender).SelectedNode;
             if (item.Level == 0) {
+
                 FillJobs(item.Text.Split(':')[0] + "-jobs.json");
 
             }
@@ -101,24 +101,24 @@ namespace SQLScheduler
         private void newJobClick(object sender, EventArgs e)
         {
 
-            TreeNode node = listDatabase.SelectedNode;
-
             Server server = null;
-            
+
             foreach(Server x in serverList)
             {
-                if (x.ip.Equals(node.Text.Split(':')[0]) && x.port.Equals(node.Text.Split(':')[1]))
+                if (x.ip.Equals(item.Text.Split(':')[0]) && x.port.Equals(item.Text.Split(':')[1]))
                     server = x;
             }
 
-            Form3 form3 = new Form3(server, sqlConnection, this);
-            form3.Show();
+            if(server != null)
+            {
+                Form3 form3 = new Form3(server, sqlConnection, this, null);
+                form3.Show();
+            }
 
         }
 
         private void editServerClick(object sender, EventArgs e)
         {
-            Console.WriteLine(listDatabase.SelectedNode.Text);
             Form2 form2 = new Form2(listDatabase.SelectedNode.Text);
             form2.Show();
         }
@@ -151,9 +151,10 @@ namespace SQLScheduler
 
         public void FillJobs(string name)
         {
-            
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            path += @"\SQLScheduler\" + name;
+
+            jobsName = name;
+
+            string path = @"C:\SQLScheduler\" + name;
 
             if (scheduledJobs.InvokeRequired)
             {
@@ -171,6 +172,9 @@ namespace SQLScheduler
                     List<Job> jobs = JsonConvert.DeserializeObject<List<Job>>(System.IO.File.ReadAllText(path));
                     if (jobs.Count > 0)
                     {
+
+                        Console.WriteLine("jobs.count > 0");
+
                         foreach (Job j in jobs)
                         {
                             ListViewItem item = new ListViewItem();
@@ -193,14 +197,125 @@ namespace SQLScheduler
             }
         }
 
+        public void scheduledJobs_RightClick(Object sender, MouseEventArgs args) {
+
+            selectedItem = scheduledJobs.GetItemAt(args.X, args.Y);
+
+            if(selectedItem != null)
+            {
+                if (args.Button == System.Windows.Forms.MouseButtons.Right)
+                {
+
+                    ContextMenu contextMenu = new ContextMenu();
+
+                    editServer = new MenuItem();
+                    editServer.Text = "Edit Job";
+                    contextMenu.MenuItems.Add(editServer);
+
+                    editServer.Click += new System.EventHandler(this.editJobClick);
+
+                    delete = new MenuItem();
+                    delete.Text = "Delete";
+                    contextMenu.MenuItems.Add(delete);
+
+                    delete.Click += new System.EventHandler(this.deleteJobClick);
+
+                    contextMenu.Show(scheduledJobs, args.Location);
+
+                }
+            }
+
+            
+
+        }
+
+        private void deleteJobClick(Object sender, EventArgs e) {
+
+            string path = @"C:\SQLScheduler\" + item.Text.Split(':')[0] + "-jobs.json";
+
+            string jobName = selectedItem.Text;
+
+            if (File.Exists(path)) {
+
+                List<Job> jobs = JsonConvert.DeserializeObject<List<Job>>(System.IO.File.ReadAllText(path));
+
+                try
+                {
+                    foreach (Job j in jobs)
+                    {
+                        if (j.getName().Equals(jobName))
+                        {
+
+                            if (scheduledJobs.InvokeRequired)
+                            {
+                                scheduledJobs.Invoke(new MethodInvoker(delegate { jobs.Remove(j); }));
+                            }
+                            else
+                            {
+                                jobs.Remove(j);
+                            }
+
+                        }
+                    }
+                } catch(InvalidOperationException x)
+                {
+
+                }
+
+                System.IO.File.WriteAllText(path, JsonConvert.SerializeObject(jobs, Formatting.Indented));
+
+            }
+
+        }
+
+        private void editJobClick(Object sender, EventArgs e) {
+
+            Server server = null;
+
+            foreach (Server x in serverList)
+            {
+                if (x.ip.Equals(item.Text.Split(':')[0]) && x.port.Equals(item.Text.Split(':')[1]))
+                    server = x;
+            }
+
+            Form3 form3 = new Form3(server, GetSqlConnection(), this, getJob(scheduledJobs.SelectedItems[0].Text));
+            form3.Show();
+
+            
+
+        }
+
+        private Job getJob(string name)
+        {
+
+            string path = @"C:\SQLScheduler\" + jobsName;
+            Job job;
+
+            if (File.Exists(path))
+            {
+
+                List<Job> jobs = JsonConvert.DeserializeObject<List<Job>>(System.IO.File.ReadAllText(path));
+
+                foreach (Job x in jobs) {
+                    if (x.getName().Equals(name))
+                    {
+                        job = x;
+                        return job;
+                    }
+                }
+
+            }
+            return null;
+        }
+
         private void getSavedData() {
 
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string path = @"C:\SQLScheduler\databases.json";
 
             connect = new Connect(this);
 
-            if (File.Exists(path + @"\SQLScheduler\databases.json")) {
-                List<Server> servers = JsonConvert.DeserializeObject<List<Server>>(System.IO.File.ReadAllText(path + @"\SQLScheduler\databases.json"));
+            if (File.Exists(path)) {
+                List<Server> servers = JsonConvert.DeserializeObject<List<Server>>(System.IO.File.ReadAllText(path));
                 
                 foreach(Server x in servers)
                 {
@@ -216,13 +331,13 @@ namespace SQLScheduler
 
         private Boolean deleteSavedData(string ipAndPort) {
 
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string path = @"C:\SQLScheduler\databases.json";
             string ip = ipAndPort.Split(':')[0];
             string port = ipAndPort.Split(':')[1];
+    
+            if (File.Exists(path)) {
 
-            if (File.Exists(path + @"\SQLScheduler\databases.json")) {
-
-                List<Server> servers = JsonConvert.DeserializeObject<List<Server>>(System.IO.File.ReadAllText(path + @"\SQLScheduler\databases.json"));
+                List<Server> servers = JsonConvert.DeserializeObject<List<Server>>(System.IO.File.ReadAllText(path));
                 List<Server> newServers = new List<Server>();
 
                 foreach(Server x in servers)
@@ -235,7 +350,7 @@ namespace SQLScheduler
 
                 }
 
-                System.IO.File.WriteAllText(path + @"\SQLScheduler\databases.json", JsonConvert.SerializeObject(newServers, Formatting.Indented));
+                System.IO.File.WriteAllText(path, JsonConvert.SerializeObject(newServers, Formatting.Indented));
                 TreeNode node = listDatabase.SelectedNode;
 
                 listDatabase.Nodes.Remove(node);

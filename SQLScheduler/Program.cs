@@ -1,30 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceProcess;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SQLScheduler
 {
     static class Program
     {
+        public static object Service { get; private set; }
 
         [STAThread]
         static void Main()
         {
-
-            try
-            {
-                ServiceBase[] serviceBases = new ServiceBase[] { new SQLService() };
-                ServiceBase.Run(serviceBases);
-            }
-            catch (ArgumentException e)
-            {
-                Console.WriteLine(e.Message);
-            }
-
-
+        
+            ServiceBase[] serviceBases = new ServiceBase[] { new SQLService() };
+            ServiceBase.Run(serviceBases);  
+            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());

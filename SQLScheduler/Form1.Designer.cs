@@ -90,7 +90,7 @@
             // newServerToolStripMenuItem
             // 
             this.newServerToolStripMenuItem.Name = "newServerToolStripMenuItem";
-            this.newServerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newServerToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
             this.newServerToolStripMenuItem.Text = "New Server";
             this.newServerToolStripMenuItem.Click += new System.EventHandler(this.newServerToolStripMenuItem_Click);
             // 
@@ -108,11 +108,12 @@
             this.scheduledJobs.TabIndex = 12;
             this.scheduledJobs.UseCompatibleStateImageBehavior = false;
             this.scheduledJobs.View = System.Windows.Forms.View.Details;
+            this.scheduledJobs.MouseDown += new System.Windows.Forms.MouseEventHandler(this.scheduledJobs_RightClick);
             // 
             // jobName
             // 
             this.jobName.Text = "Name";
-            this.jobName.Width = 82;
+            this.jobName.Width = 100;
             // 
             // jobEnabled
             // 
@@ -122,12 +123,12 @@
             // jobLastExec
             // 
             this.jobLastExec.Text = "Last Execute";
-            this.jobLastExec.Width = 92;
+            this.jobLastExec.Width = 110;
             // 
             // jobNextExec
             // 
             this.jobNextExec.Text = "Next Execute";
-            this.jobNextExec.Width = 100;
+            this.jobNextExec.Width = 110;
             // 
             // Form1
             // 

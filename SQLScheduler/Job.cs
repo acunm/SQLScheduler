@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SQLScheduler
 {
-    class Job
+    public class Job
     {
 
         public string name;
+        public string ip;
+        public string port;
         public string description;
         public Boolean oneTime;
         public int recurringTime;
@@ -16,6 +19,7 @@ namespace SQLScheduler
         public DateTime nextExecute;
         public string sqlQuery;
         public Boolean enabled;
+        public List<string> recipients;
         
         public Job()
         {
@@ -65,6 +69,18 @@ namespace SQLScheduler
         {
             this.enabled = enabled;
         }
+        public void setIp(string ip)
+        {
+            this.ip = ip;
+        }
+        public void setPort(string port)
+        {
+            this.port = port;
+        }
+        public void setRecipients(List<string> recipients)
+        {
+            this.recipients = recipients;
+        }
 
         public string getName()
         {
@@ -109,6 +125,18 @@ namespace SQLScheduler
         public Boolean getEnabled()
         {
             return enabled;
+        }
+        public string getIp()
+        {
+            return ip;
+        }
+        public string getPort()
+        {
+            return port;
+        }
+        public List<string> getRecipients()
+        {
+            return recipients;
         }
 
     }

@@ -1,15 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SQLScheduler
@@ -20,8 +13,10 @@ namespace SQLScheduler
         private SqlCommand cmd = new SqlCommand();
         private SqlConnection sqlConnection;
         private Form1 form;
+        private DataGridViewButtonColumn buttonColumn = new DataGridViewButtonColumn();
+        
 
-        public Form3(Server server, SqlConnection sqlConnection, Form1 form)
+        public Form3(Server server, SqlConnection sqlConnection, Form1 form, Job job)
         {
             InitializeComponent();
             this.server = server;
@@ -33,6 +28,53 @@ namespace SQLScheduler
             timeBox.Items.Add("Weekly");
             timeBox.Items.Add("Monthly");
             timeBox.SelectedItem = "Daily";
+
+            buttonColumn.Name = "Delete";
+            buttonColumn.HeaderText = "Delete";
+            buttonColumn.Text = "Delete";
+
+            buttonColumn.UseColumnTextForButtonValue = true;
+            dataGridView1.Columns.Insert(1, buttonColumn);
+
+            for (int i = 0; i < 24; i++)
+            {
+                hourBox.Items.Add(i.ToString("00"));
+            }
+
+            if (job != null) {
+                sqlcommand.Text = job.getSqlQuery();
+                descriptionBox.Text = job.getDescription();
+                nameBox.Text = job.getName();
+
+                if (job.getOneTime())
+                {
+                    onetime.Checked = true;
+                }
+                else
+                {
+                    recurrent.Checked = true;
+                    timeupanddown.Value = job.getRecurringTime();
+                    timeBox.SelectedItem = job.getRecurringPeriod();
+                    startDate.Value = job.getStartingTime();
+                    endDate.Value = job.getEndingTime();
+                    
+                    foreach(string x in job.getRecipients())
+                    {
+                        dataGridView1.Rows.Add(x);
+                    }
+
+                    string[] lines = System.IO.File.ReadAllLines(@"C:\SQLScheduler\logs.txt");
+
+                    foreach(string x in lines)
+                    {
+                        if (x.Contains(job.getIp()))
+                            logBox.AppendText(x + "\n");
+                    }
+                    
+                    
+                }
+                
+            }
 
         }
 
@@ -104,6 +146,21 @@ namespace SQLScheduler
                         job.setEnabled(true);
                         job.setSqlQuery(sqlcommand.Text);
                         job.setDescription(descriptionBox.Text);
+                        job.setIp(server.ip);
+                        job.setPort(server.port);
+
+                        List<string> recipients = new List<string>();
+
+                        foreach(DataGridViewRow x in dataGridView1.Rows)
+                        {
+                            if (x.Cells[0].Value != null)
+                                if(!recipients.Contains(x.Cells[0].Value as string))
+                                    recipients.Add(x.Cells[0].Value as string);
+                        }
+                        
+
+                        if(recipients.Count > 0)
+                            job.setRecipients(recipients);
 
                         if (string.IsNullOrEmpty(sqlcommand.Text))
                             job.setSqlQuery(sqlcommand.Text);
@@ -116,36 +173,92 @@ namespace SQLScheduler
                 else
                 {
                     job.setOneTime(false);
-                    job.setRecurringTime((int)timeupanddown.Value);
-                    job.setLastExecute(DateTime.Now);
-                    job.setNextExecute(DateTime.Now.AddSeconds(36000));
-                    if (!string.IsNullOrEmpty(timeBox.Text))
+
+                    if (timeBox.SelectedItem.ToString().Equals("Daily")) {
+
+                        if ((int)timeupanddown.Value >= 25 || (int)timeupanddown.Value <= 0) {
+                            MessageBox.Show("Must be between 0-24");
+                            timeupanddown.Focus();
+                        } else
+                        {
+                            job.setRecurringTime((int)timeupanddown.Value);
+                            job.setNextExecute(DateTime.Now.AddHours(24 / (int)timeupanddown.Value));
+                            job.setLastExecute(DateTime.Now);
+                            job.setRecurringPeriod(timeBox.Text);
+
+                        }
+
+                    } else if (timeBox.SelectedItem.ToString().Equals("Weekly"))
                     {
 
-                        job.setRecurringPeriod(timeBox.Text);
-
-                        if (DateTime.Compare(DateTime.Now, endDate.Value) > 0)
+                        if((int)timeupanddown.Value <= 0 || (int)timeupanddown.Value >= 8)
                         {
-                            MessageBox.Show("End date can not be in past.");
-                        }
-                        else {
-                            startDate.Value = DateTime.Now;
-                            job.setEndingTime(endDate.Value);
-                            job.setStartingTime(startDate.Value);
-                            job.setEnabled(true);
-                            job.setSqlQuery(sqlcommand.Text);
-                            job.setDescription(descriptionBox.Text);
+                            MessageBox.Show("Must be between 0-7");
+                            timeupanddown.Focus();
+                        } else
+                        {
+                            job.setRecurringTime((int)timeupanddown.Value);
+                            job.setNextExecute(DateTime.Now.AddDays(7 / (int) timeupanddown.Value));
+                            job.setLastExecute(DateTime.Now);
+                            job.setRecurringPeriod(timeBox.Text);
 
-                            if(string.IsNullOrEmpty(sqlcommand.Text))
-                                job.setSqlQuery(sqlcommand.Text);
-
-                            createTask(job, server.ip);
-                            this.Dispose();
                         }
 
+                    } else if (timeBox.SelectedItem.ToString().Equals("Monthly"))
+                    {
+
+                        if((int)timeupanddown.Value <= 0 || (int)timeupanddown.Value >= 31)
+                        {
+                            MessageBox.Show("Must be between 0-30");
+                            timeupanddown.Focus();
+                        }
+                        else
+                        {
+                            job.setRecurringTime((int)timeupanddown.Value);
+                            job.setNextExecute(DateTime.Now.AddDays(30 / (int)timeupanddown.Value));
+                            job.setLastExecute(DateTime.Now);
+                            job.setRecurringPeriod(timeBox.Text);
+                        }
+
+                    } else
+                    {
+                        MessageBox.Show("Error with timebox");
                     }
-                    else
-                        MessageBox.Show("Please select time period.");
+
+                    if (DateTime.Compare(DateTime.Now, endDate.Value) > 0)
+                    {
+                        MessageBox.Show("End date can not be in past.");
+                    }
+                    else {
+
+                        startDate.Value = DateTime.Now;
+                        job.setEndingTime(endDate.Value);
+                        job.setStartingTime(startDate.Value);
+                        job.setEnabled(true);
+                        job.setSqlQuery(sqlcommand.Text);
+                        job.setDescription(descriptionBox.Text);
+                        job.setIp(server.ip);
+                        job.setPort(server.port);
+
+                        List<string> recipients = new List<string>();
+
+                        foreach (DataGridViewRow x in dataGridView1.Rows)
+                        {
+                            if(x.Cells[0].Value != null)
+                                if (!recipients.Contains(x.Cells[0].Value as string))
+                                    recipients.Add(x.Cells[0].Value as string);
+                        }
+
+                        if (recipients.Count > 0)
+                            job.setRecipients(recipients);
+
+                        if (string.IsNullOrEmpty(sqlcommand.Text))
+                            job.setSqlQuery(sqlcommand.Text);
+
+                        createTask(job, server.ip);
+                        this.Dispose();
+                    }
+                    
                 }
 
             }
@@ -158,8 +271,7 @@ namespace SQLScheduler
 
         private void createTask(Job job, string serverName)
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            path += @"\SQLScheduler\" + serverName + "-jobs.json";
+            string path = @"C:\SQLScheduler\" + serverName + "-jobs.json";
 
             if (!File.Exists(path))
             {
@@ -171,17 +283,20 @@ namespace SQLScheduler
             {
                 List<Job> jobList = JsonConvert.DeserializeObject<List<Job>>(System.IO.File.ReadAllText(path));
                 Boolean save = true;
+                List<Job> newJobList = new List<Job>();
 
                 foreach (Job j in jobList)
                 {
                     if (j.getName().Equals(job.getName()))
-                        save = false;
+                        Console.WriteLine("hello");
+                    else
+                        newJobList.Add(j);
                 }
 
                 if (save)
                 {
-                    jobList.Add(job);
-                    System.IO.File.WriteAllText(path, JsonConvert.SerializeObject(jobList, Formatting.Indented));
+                    newJobList.Add(job);
+                    System.IO.File.WriteAllText(path, JsonConvert.SerializeObject(newJobList, Formatting.Indented));
                 }
             }
 
